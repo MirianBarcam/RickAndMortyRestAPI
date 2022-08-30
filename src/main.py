@@ -9,6 +9,7 @@ from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, User
+from models import db, Character
 #from models import Person
 
 app = Flask(__name__)
@@ -34,7 +35,33 @@ def sitemap():
 def handle_hello():
 
     response_body = {
-        "msg": "Hello, this is your GET /user response "
+        "msg": "Hello, don pepito "
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/character', methods=['GET'])
+def get_all_character():
+    all_character = Character.query.all()
+    character_list = list(map(lambda obj : obj.serialize(),all_character))
+    print(character_list)
+    response_body = {
+        "success": True,
+        "result" : character_list
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/character', methods=['POST'])
+def add_character():
+    body = json.loads(request.data)
+    new_character = Character(name=body["name"],status=body["status"],species=body["species"],type_character=body["type_character"],gender=body["gender"],origin=body["origin"],location=body["location"],image=body["image"],episode=body["episode"],url=body["url"],created=body["created"])
+    db.session.add(new_character)
+    db.session.commit()
+    print(new_character)
+    response_body = {
+        "success": True,
+        "result" : character_list
     }
 
     return jsonify(response_body), 200
